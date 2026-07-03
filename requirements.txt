@@ -1,0 +1,9 @@
+# Core dependencies for CollisionVision
+ultralytics>=8.1.0      # YOLOv8-Seg training & inference
+opencv-python>=4.8.0    # Image I/O, mask/contour operations
+streamlit>=1.30.0       # Interactive damage-inspection web app
+numpy>=1.24.0           # Array / mask math
+
+# Required by the above
+PyYAML>=6.0             # config.yaml / data.yaml parsing
+Pillow>=10.0.0          # Streamlit image decoding

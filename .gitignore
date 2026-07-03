@@ -1,0 +1,42 @@
+# Byte-compiled / optimized / packages
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# ML artifacts / training output
+runs/
+wandb/
+*.pt
+*.onnx
+*.engine
+!requirements*.txt
+
+# Datasets & generated labels (keep folder scaffolding via .gitkeep)
+data/raw/*
+data/processed/*
+!data/**/.gitkeep
+models/*
+!models/.gitkeep
+outputs/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+htmlcov/
