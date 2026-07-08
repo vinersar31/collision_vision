@@ -7,7 +7,12 @@ CollisionVision converts polygon annotations from **VGG Image Annotator (VIA)** 
 model, and serves an interactive Streamlit app that overlays the predicted masks
 directly on an uploaded photo.
 
----
+<p align="center">
+  <img src="docs/images/streamlit-detection.png" alt="Streamlit app showing the original photo next to the detected damage overlay with per-instance confidence scores" width="850">
+</p>
+<p align="center">
+  <img src="docs/images/streamlit-results-table.png" alt="Streamlit results table listing each detected damage region with confidence and area" width="850">
+</p>
 
 ## Features
 
@@ -17,30 +22,6 @@ directly on an uploaded photo.
 - **Streamlit app** for drag-and-drop inference with a side-by-side mask overlay.
 - **CLI** (`collision-vision`) for `preprocess` / `train` / `infer`.
 - **Tests, Makefile and Dockerfile** included.
-
-## Project structure
-
-```
-collision_vision/
-├── app.py                       # Streamlit inference app
-├── config.yaml                  # Training hyperparameters (fine-tuning)
-├── requirements.txt
-├── src/collision_vision/
-│   ├── config.py                # config.yaml loader
-│   ├── converters/
-│   │   ├── base.py              # BaseConverter + polygon normalization
-│   │   ├── via_converter.py     # VIA  -> YOLOv8-Seg
-│   │   └── coco_converter.py    # COCO -> YOLOv8-Seg
-│   ├── split.py                 # train/val splitter
-│   ├── preprocess.py            # convert -> split -> data.yaml
-│   ├── train.py                 # SegmentationTrainer (Ultralytics wrapper)
-│   ├── inference.py             # DamageSegmenter + DamageInstance
-│   ├── visualize.py             # MaskVisualizer overlay
-│   └── cli.py                   # `collision-vision` entry point
-├── tests/                       # converter unit tests
-├── data/{raw,processed}/        # inputs / generated dataset
-└── models/                      # trained weights
-```
 
 ## Installation
 
