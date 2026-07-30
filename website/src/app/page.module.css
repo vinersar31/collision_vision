@@ -1,0 +1,224 @@
+.main {
+  min-height: 100vh;
+  padding: 0 0 4rem 0;
+}
+
+/* Hero Section */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8rem 2rem 6rem;
+  position: relative;
+}
+
+.heroTitle {
+  font-size: 4.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #f8fafc 0%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1.5rem;
+}
+
+.heroGradient {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.heroSubtitle {
+  font-size: 1.25rem;
+  color: #94a3b8;
+  max-width: 600px;
+  margin-bottom: 3rem;
+}
+
+.ctaContainer {
+  display: flex;
+  gap: 1rem;
+}
+
+.primaryCta {
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  animation: pulse-glow 3s infinite;
+}
+
+.primaryCta:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+.secondaryCta {
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.secondaryCta:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Section Common */
+.section {
+  padding: 6rem 2rem;
+}
+
+.sectionTitle {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 4rem;
+  color: var(--foreground);
+}
+
+/* Features Grid */
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.featureCard {
+  padding: 2.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.featureCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.featureIcon {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  display: inline-block;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.featureTitle {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.featureDesc {
+  color: #94a3b8;
+}
+
+/* AI Details */
+.aiSection {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.aiCard {
+  padding: 2rem;
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.aiCardContent {
+  flex: 1;
+}
+
+.aiCard h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: var(--primary);
+}
+
+.aiCard p {
+  color: #cbd5e1;
+}
+
+/* Examples */
+.examplesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 3rem;
+}
+
+.exampleImageWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+}
+
+.exampleImageWrapper img {
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.exampleImageWrapper:hover img {
+  transform: scale(1.05);
+}
+
+.exampleLabel {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  backdrop-filter: blur(4px);
+}
+
+/* Code */
+.codeBlock {
+  background: #1e293b !important;
+  padding: 2rem !important;
+  overflow-x: auto;
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: #e2e8f0;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.codeComment { color: #64748b; }
+.codeCommand { color: #38bdf8; }
+.codeArg { color: #a78bfa; }
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 3rem 2rem;
+  border-top: 1px solid var(--glass-border);
+  margin-top: 4rem;
+  color: #64748b;
+}
+
+@media (max-width: 768px) {
+  .heroTitle {
+    font-size: 3rem;
+  }
+  .aiCard {
+    flex-direction: column;
+  }
+  .examplesGrid {
+    grid-template-columns: 1fr;
+  }
+}
