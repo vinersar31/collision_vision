@@ -13,12 +13,13 @@ VIA does not store image dimensions, so the original images are read from
 
 from __future__ import annotations
 
+import concurrent.futures
 import json
 import logging
 from pathlib import Path
 from typing import Any
 
-import cv2
+from PIL import Image
 
 from .base import BaseConverter, ImageAnnotation, Polygon
 
@@ -69,10 +70,13 @@ class VIAConverter(BaseConverter):
         if filename in self._size_cache:
             return self._size_cache[filename]
         image_path = self.images_dir / filename
-        image = cv2.imread(str(image_path))
-        if image is None:
+        try:
+            with Image.open(str(image_path)) as img:
+                width, height = img.size
+        except FileNotFoundError:
             raise FileNotFoundError(f"Could not read image: {image_path}")
-        height, width = image.shape[:2]
+        except OSError:
+            raise FileNotFoundError(f"Could not read image: {image_path}")
         self._size_cache[filename] = (width, height)
         return width, height
 
@@ -83,7 +87,9 @@ class VIAConverter(BaseConverter):
         if self.attribute_key is not None:
             label = region_attributes.get(self.attribute_key)
         else:
-            label = next((v for v in region_attributes.values() if v not in (None, "")), None)
+            label = next(
+                (v for v in region_attributes.values() if v not in (None, "")), None
+            )
         if label is None:
             return self.default_class_id
         return self.class_map.get(str(label).lower(), self.default_class_id)
@@ -109,6 +115,26 @@ class VIAConverter(BaseConverter):
     def parse(self) -> list[ImageAnnotation]:
         """Parse the VIA export into :class:`ImageAnnotation` objects."""
         raw = self._load()
+
+        # Pre-fetch image sizes concurrently to minimize I/O wait
+        filenames_to_load = set()
+        for entry in raw.values():
+            filename = entry.get("filename")
+            if not filename:
+                continue
+            regions = entry.get("regions", [])
+            if isinstance(regions, dict):
+                regions = list(regions.values())
+            if not regions:
+                continue
+            if filename not in self._size_cache:
+                filenames_to_load.add(filename)
+
+        if filenames_to_load:
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                # Execution raises exceptions if any file is not found
+                list(executor.map(self._image_size, filenames_to_load))
+
         annotations: list[ImageAnnotation] = []
         for entry in raw.values():
             filename = entry.get("filename")
@@ -128,6 +154,8 @@ class VIAConverter(BaseConverter):
                 class_id = self._resolve_class_id(region.get("region_attributes", {}))
                 polygons.append(Polygon(class_id=class_id, points=points))
             annotations.append(
-                ImageAnnotation(filename=filename, width=width, height=height, polygons=polygons)
+                ImageAnnotation(
+                    filename=filename, width=width, height=height, polygons=polygons
+                )
             )
         return annotations
