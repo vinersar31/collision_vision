@@ -118,7 +118,7 @@ class DamageSegmenter:
                     mask=mask,
                     polygon=polygon_int,
                     bbox=tuple(int(v) for v in boxes[i]),
-                    area_px=int(mask.sum()),
+                    area_px=int(cv2.contourArea(polygon_int)),
                 )
             )
         return instances
