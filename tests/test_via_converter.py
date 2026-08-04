@@ -79,3 +79,43 @@ def test_via_missing_image_raises(via_1x_json, tmp_path):
 
     with pytest.raises(FileNotFoundError):
         converter.parse()
+
+def test_via_path_traversal(tmp_path):
+    import json
+    import numpy as np
+    import cv2
+
+    images_dir = tmp_path / "images"
+    images_dir.mkdir()
+
+    # Create a dummy image in images_dir
+    img = np.zeros((10, 10, 3), dtype=np.uint8)
+    cv2.imwrite(str(images_dir / "safe.jpg"), img)
+
+    # Create a file outside images_dir
+    outside_dir = tmp_path / "outside"
+    outside_dir.mkdir()
+    cv2.imwrite(str(outside_dir / "secret.jpg"), img)
+
+    annotations_path = tmp_path / "via.json"
+    data = {
+        "1": {
+            "filename": "../outside/secret.jpg",
+            "regions": {
+                "0": {
+                    "shape_attributes": {"name": "polygon", "all_points_x": [1,2,3], "all_points_y": [1,2,3]},
+                    "region_attributes": {"damage": "dent"}
+                }
+            }
+        }
+    }
+    with open(annotations_path, "w") as f:
+        json.dump(data, f)
+
+    converter = VIAConverter(annotations_path, images_dir, attribute_key="damage")
+
+    # The converter is fixed and uses Path(filename).name ("secret.jpg"), so it will try to read
+    # images_dir / "secret.jpg", which doesn't exist, and raise FileNotFoundError.
+    # It will not traverse up and read ../outside/secret.jpg.
+    with pytest.raises(FileNotFoundError):
+        converter.parse()

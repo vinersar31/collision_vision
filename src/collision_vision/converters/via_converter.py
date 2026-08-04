@@ -68,7 +68,10 @@ class VIAConverter(BaseConverter):
         """Return ``(width, height)`` for an image, reading it once and caching."""
         if filename in self._size_cache:
             return self._size_cache[filename]
-        image_path = self.images_dir / filename
+
+        # Prevent path traversal by extracting only the filename
+        safe_filename = Path(filename).name
+        image_path = self.images_dir / safe_filename
         image = cv2.imread(str(image_path))
         if image is None:
             raise FileNotFoundError(f"Could not read image: {image_path}")
