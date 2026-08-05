@@ -27,11 +27,6 @@ class SegmentationTrainer:
         self.config = config
         self._model = None  # lazily constructed YOLO instance
 
-    @classmethod
-    def from_config_file(cls, path: str | Path) -> "SegmentationTrainer":
-        """Build a trainer from a ``config.yaml`` path."""
-        return cls(Config.from_yaml(path))
-
     @property
     def model(self):
         """The underlying ``ultralytics.YOLO`` model (loaded on first access)."""
@@ -55,7 +50,3 @@ class SegmentationTrainer:
         kwargs = self.config.train_kwargs(**overrides)
         logger.info("Starting training with: %s", kwargs)
         return self.model.train(**kwargs)
-
-    def validate(self, **overrides: Any):
-        """Run validation on the configured dataset."""
-        return self.model.val(data=self.config.data, **overrides)
