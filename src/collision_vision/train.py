@@ -55,7 +55,3 @@ class SegmentationTrainer:
         kwargs = self.config.train_kwargs(**overrides)
         logger.info("Starting training with: %s", kwargs)
         return self.model.train(**kwargs)
-
-    def validate(self, **overrides: Any):
-        """Run validation on the configured dataset."""
-        return self.model.val(data=self.config.data, **overrides)
