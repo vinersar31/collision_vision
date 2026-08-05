@@ -11,12 +11,12 @@ from .inference import DamageInstance
 
 # Distinct, high-contrast BGR colors cycled per class index.
 _DEFAULT_PALETTE: tuple[tuple[int, int, int], ...] = (
-    (56, 56, 255),    # red      -> class 0 (e.g. dent)
-    (56, 255, 56),    # green    -> class 1 (e.g. scratch)
-    (255, 128, 0),    # blue     -> class 2 (e.g. structural)
-    (0, 215, 255),    # amber
-    (255, 0, 255),    # magenta
-    (255, 255, 0),    # cyan
+    (56, 56, 255),  # red      -> class 0 (e.g. dent)
+    (56, 255, 56),  # green    -> class 1 (e.g. scratch)
+    (255, 128, 0),  # blue     -> class 2 (e.g. structural)
+    (0, 215, 255),  # amber
+    (255, 0, 255),  # magenta
+    (255, 255, 0),  # cyan
 )
 
 
@@ -67,25 +67,32 @@ class MaskVisualizer:
         # Blend all mask fills in one pass so overlapping regions stay readable.
         fill = base.copy()
         for instance in instances:
-            fill[instance.mask.astype(bool)] = self.color_for(instance.class_id)
+            color = self.color_for(instance.class_id)
+            cv2.fillPoly(fill, [instance.polygon], color=color)
         cv2.addWeighted(fill, self.alpha, base, 1.0 - self.alpha, 0.0, dst=base)
 
         for instance in instances:
             color = self.color_for(instance.class_id)
             if draw_contours and len(instance.polygon) >= 3:
-                cv2.polylines(base, [instance.polygon], isClosed=True, color=color, thickness=2)
+                cv2.polylines(
+                    base, [instance.polygon], isClosed=True, color=color, thickness=2
+                )
             if draw_labels:
                 self._draw_label(base, instance, color)
         return base
 
     @staticmethod
-    def _draw_label(image: np.ndarray, instance: DamageInstance, color: tuple[int, int, int]) -> None:
+    def _draw_label(
+        image: np.ndarray, instance: DamageInstance, color: tuple[int, int, int]
+    ) -> None:
         """Draw a filled label tag at the top-left of an instance's bbox."""
         x1, y1, _, _ = instance.bbox
         text = f"{instance.class_name} {instance.confidence:.2f}"
         (tw, th), baseline = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
         top = max(y1, th + baseline)
-        cv2.rectangle(image, (x1, top - th - baseline), (x1 + tw, top), color, thickness=-1)
+        cv2.rectangle(
+            image, (x1, top - th - baseline), (x1 + tw, top), color, thickness=-1
+        )
         cv2.putText(
             image,
             text,
