@@ -50,7 +50,12 @@ def main() -> None:
         st.info("Upload an image to run damage segmentation.")
         return
 
-    if not Path(weights).is_file():
+    weights_path = Path(weights).resolve()
+    if not weights_path.is_relative_to(Path.cwd()):
+        st.error(f"Invalid weights path '{weights}'. Path traversal is not allowed.")
+        return
+
+    if not weights_path.is_file():
         st.error(
             f"Weights not found at '{weights}'. Train a model first "
             "(`collision-vision train`) or point to a valid .pt file."
