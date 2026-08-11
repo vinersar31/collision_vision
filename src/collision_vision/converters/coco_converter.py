@@ -79,7 +79,8 @@ class COCOConverter(BaseConverter):
                 class_id = category_to_class.get(annotation["category_id"], 0)
                 # Each element is one polygon part: a flat [x1, y1, x2, y2, ...] list.
                 for part in segmentation:
-                    points = list(zip(part[0::2], part[1::2]))
+                    it = iter(part)
+                    points = list(zip(it, it))
                     if points:
                         polygons.append(Polygon(class_id=class_id, points=points))
 
