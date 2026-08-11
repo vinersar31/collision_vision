@@ -10,6 +10,7 @@ Run with::
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 
 import cv2
@@ -19,6 +20,8 @@ from PIL import Image
 
 from collision_vision.inference import DamageSegmenter
 from collision_vision.visualize import MaskVisualizer
+
+logger = logging.getLogger(__name__)
 
 DEFAULT_WEIGHTS = "models/best.pt"
 
@@ -32,7 +35,9 @@ def load_segmenter(weights: str) -> DamageSegmenter:
 def main() -> None:
     st.set_page_config(page_title="CollisionVision", page_icon="🚗", layout="wide")
     st.title("CollisionVision — Car Damage Segmentation")
-    st.caption("Instance segmentation of dents, scratches and structural damage with YOLOv8-Seg.")
+    st.caption(
+        "Instance segmentation of dents, scratches and structural damage with YOLOv8-Seg."
+    )
 
     # --- Sidebar controls --------------------------------------------------
     with st.sidebar:
@@ -68,8 +73,11 @@ def main() -> None:
 
     try:
         segmenter = load_segmenter(weights)
-    except Exception as exc:  # surface model-loading errors in the UI
-        st.error(f"Failed to load model: {exc}")
+    except Exception:
+        logger.exception("Failed to load segmentation model from '%s'", weights)
+        st.error(
+            "An unexpected error occurred while loading the model. Please check the logs."
+        )
         return
 
     with st.spinner("Detecting damage..."):
