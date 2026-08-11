@@ -72,7 +72,9 @@ class DamageSegmenter:
         # {class_id: name} provided by the trained model.
         self.class_names: dict[int, str] = dict(self.model.names)
 
-    def predict(self, image: ImageInput, conf: float | None = None) -> list[DamageInstance]:
+    def predict(
+        self, image: ImageInput, conf: float | None = None
+    ) -> list[DamageInstance]:
         """Run segmentation on a single image.
 
         Args:
@@ -117,7 +119,7 @@ class DamageSegmenter:
                     confidence=float(confidences[i]),
                     mask=mask,
                     polygon=polygon_int,
-                    bbox=tuple(int(v) for v in boxes[i]),
+                    bbox=tuple(boxes[i].tolist()),
                     area_px=int(cv2.contourArea(polygon_int)),
                 )
             )
