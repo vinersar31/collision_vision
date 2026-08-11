@@ -113,7 +113,7 @@ class DamageSegmenter:
             instances.append(
                 DamageInstance(
                     class_id=class_id,
-                    class_name=self.class_names.get(class_id, str(class_id)),
+                    class_name=self.class_names.get(class_id) or str(class_id),
                     confidence=float(confidences[i]),
                     mask=mask,
                     polygon=polygon_int,
