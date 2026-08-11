@@ -69,7 +69,9 @@ class VIAConverter(BaseConverter):
         """Return ``(width, height)`` for an image, reading it once and caching."""
         if filename in self._size_cache:
             return self._size_cache[filename]
-        image_path = self.images_dir / filename
+        image_path = (self.images_dir / filename).resolve()
+        if not image_path.is_relative_to(self.images_dir.resolve()):
+            raise ValueError(f"Path traversal detected: {filename}")
         try:
             with Image.open(str(image_path)) as img:
                 width, height = img.size
