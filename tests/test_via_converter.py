@@ -15,7 +15,10 @@ def test_via_1x_parse(via_1x_json, images_dir, expected):
 
     assert len(annotations) == 1
     annotation = annotations[0]
-    assert (annotation.width, annotation.height) == (expected["img_w"], expected["img_h"])
+    assert (annotation.width, annotation.height) == (
+        expected["img_w"],
+        expected["img_h"],
+    )
     assert len(annotation.polygons) == 1
     assert annotation.polygons[0].class_id == 1  # "scratch"
     assert len(annotation.polygons[0].points) == 4
@@ -78,4 +81,37 @@ def test_via_missing_image_raises(via_1x_json, tmp_path):
     converter = VIAConverter(via_1x_json, empty_dir, attribute_key="damage")
 
     with pytest.raises(FileNotFoundError):
+        converter.parse()
+
+
+def test_via_path_traversal(tmp_path):
+    import json
+
+    # Create malicious JSON data
+    malicious_data = {
+        "1": {
+            "filename": "../../../etc/passwd",
+            "size": 1000,
+            "regions": [
+                {
+                    "shape_attributes": {
+                        "name": "polygon",
+                        "all_points_x": [0, 10, 10, 0],
+                        "all_points_y": [0, 0, 10, 10],
+                    },
+                    "region_attributes": {"damage": "dent"},
+                }
+            ],
+        }
+    }
+
+    annotations_path = tmp_path / "malicious.json"
+    annotations_path.write_text(json.dumps(malicious_data))
+
+    images_dir = tmp_path / "images"
+    images_dir.mkdir()
+
+    converter = VIAConverter(annotations_path, images_dir)
+
+    with pytest.raises(ValueError, match="Path traversal detected"):
         converter.parse()
