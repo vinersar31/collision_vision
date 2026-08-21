@@ -1,7 +1,5 @@
 """Tests for :class:`collision_vision.converters.VIAConverter`."""
 
-from __future__ import annotations
-
 import pytest
 
 from collision_vision.converters import VIAConverter
