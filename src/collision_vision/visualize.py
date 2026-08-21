@@ -68,14 +68,14 @@ class MaskVisualizer:
         fill = base.copy()
         for instance in instances:
             color = self.color_for(instance.class_id)
-            cv2.fillPoly(fill, [instance.polygon], color=color)
+            cv2.fillPoly(fill, (instance.polygon,), color=color)
         cv2.addWeighted(fill, self.alpha, base, 1.0 - self.alpha, 0.0, dst=base)
 
         for instance in instances:
             color = self.color_for(instance.class_id)
             if draw_contours and len(instance.polygon) >= 3:
                 cv2.polylines(
-                    base, [instance.polygon], isClosed=True, color=color, thickness=2
+                    base, (instance.polygon,), isClosed=True, color=color, thickness=2
                 )
             if draw_labels:
                 self._draw_label(base, instance, color)

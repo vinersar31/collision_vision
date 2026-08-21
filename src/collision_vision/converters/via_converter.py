@@ -126,7 +126,7 @@ class VIAConverter(BaseConverter):
                 continue
             regions = entry.get("regions", [])
             if isinstance(regions, dict):
-                regions = list(regions.values())
+                regions = regions.values()
             if not regions:
                 continue
             if filename not in self._size_cache:
@@ -144,7 +144,7 @@ class VIAConverter(BaseConverter):
                 continue
             regions = entry.get("regions", [])
             if isinstance(regions, dict):  # VIA 1.x stores regions as a dict
-                regions = list(regions.values())
+                regions = regions.values()
             if not regions:
                 continue
             width, height = self._image_size(filename)
