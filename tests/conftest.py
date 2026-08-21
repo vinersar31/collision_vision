@@ -1,7 +1,5 @@
 """Shared pytest fixtures: synthetic VIA / COCO annotations and a dummy image."""
 
-from __future__ import annotations
-
 import json
 
 import cv2
@@ -103,8 +101,16 @@ def coco_json(tmp_path):
                 "image_id": 1,
                 "category_id": 2,  # -> "scratch"
                 "segmentation": [
-                    [POLY_X[0], POLY_Y[0], POLY_X[1], POLY_Y[1],
-                     POLY_X[2], POLY_Y[2], POLY_X[3], POLY_Y[3]]
+                    [
+                        POLY_X[0],
+                        POLY_Y[0],
+                        POLY_X[1],
+                        POLY_Y[1],
+                        POLY_X[2],
+                        POLY_Y[2],
+                        POLY_X[3],
+                        POLY_Y[3],
+                    ]
                 ],
                 "iscrowd": 0,
             }

@@ -23,30 +23,61 @@ def _build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     # --- preprocess --------------------------------------------------------
-    pre = subparsers.add_parser("preprocess", help="Build a YOLOv8-Seg dataset from annotations.")
-    pre.add_argument("--format", choices=["via", "coco"], required=True, help="Annotation format.")
-    pre.add_argument("--annotations", required=True, help="Path to the annotation JSON export.")
-    pre.add_argument("--images", required=True, help="Directory containing the source images.")
+    pre = subparsers.add_parser(
+        "preprocess", help="Build a YOLOv8-Seg dataset from annotations."
+    )
+    pre.add_argument(
+        "--format", choices=["via", "coco"], required=True, help="Annotation format."
+    )
+    pre.add_argument(
+        "--annotations", required=True, help="Path to the annotation JSON export."
+    )
+    pre.add_argument(
+        "--images", required=True, help="Directory containing the source images."
+    )
     pre.add_argument("--output", default="data/processed", help="Output dataset root.")
-    pre.add_argument("--val-ratio", type=float, default=0.2, help="Validation split fraction.")
+    pre.add_argument(
+        "--val-ratio", type=float, default=0.2, help="Validation split fraction."
+    )
     pre.add_argument("--seed", type=int, default=0, help="Random seed for the split.")
-    pre.add_argument("--classes", nargs="+", default=list(DEFAULT_CLASSES), help="Ordered class names.")
-    pre.add_argument("--attribute-key", default=None, help="VIA region_attributes key holding the label.")
+    pre.add_argument(
+        "--classes",
+        nargs="+",
+        default=list(DEFAULT_CLASSES),
+        help="Ordered class names.",
+    )
+    pre.add_argument(
+        "--attribute-key",
+        default=None,
+        help="VIA region_attributes key holding the label.",
+    )
 
     # --- train -------------------------------------------------------------
     train = subparsers.add_parser("train", help="Fine-tune a YOLOv8-Seg model.")
     train.add_argument("--config", default="config.yaml", help="Path to config.yaml.")
-    train.add_argument("--model", default=None, help="Override the checkpoint (e.g. yolov8n-seg.pt).")
-    train.add_argument("--epochs", type=int, default=None, help="Override the number of epochs.")
-    train.add_argument("--batch", type=int, default=None, help="Override the batch size.")
-    train.add_argument("--imgsz", type=int, default=None, help="Override the training image size.")
+    train.add_argument(
+        "--model", default=None, help="Override the checkpoint (e.g. yolov8n-seg.pt)."
+    )
+    train.add_argument(
+        "--epochs", type=int, default=None, help="Override the number of epochs."
+    )
+    train.add_argument(
+        "--batch", type=int, default=None, help="Override the batch size."
+    )
+    train.add_argument(
+        "--imgsz", type=int, default=None, help="Override the training image size."
+    )
     train.add_argument("--device", default=None, help="Override the training device.")
 
     # --- infer -------------------------------------------------------------
     infer = subparsers.add_parser("infer", help="Segment images and save overlays.")
     infer.add_argument("--weights", required=True, help="Path to trained .pt weights.")
-    infer.add_argument("--source", required=True, help="Image file or directory of images.")
-    infer.add_argument("--output", default="outputs", help="Directory to write overlays into.")
+    infer.add_argument(
+        "--source", required=True, help="Image file or directory of images."
+    )
+    infer.add_argument(
+        "--output", default="outputs", help="Directory to write overlays into."
+    )
     infer.add_argument("--conf", type=float, default=0.25, help="Confidence threshold.")
 
     return parser
@@ -74,7 +105,9 @@ def _run_train(args: argparse.Namespace) -> None:
     if args.model:
         config.model = args.model
     trainer = SegmentationTrainer(config)
-    trainer.train(epochs=args.epochs, batch=args.batch, imgsz=args.imgsz, device=args.device)
+    trainer.train(
+        epochs=args.epochs, batch=args.batch, imgsz=args.imgsz, device=args.device
+    )
 
 
 def _run_infer(args: argparse.Namespace) -> None:

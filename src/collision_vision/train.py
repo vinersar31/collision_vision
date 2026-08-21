@@ -1,7 +1,5 @@
 """Fine-tune a YOLOv8-Seg model using the project ``config.yaml``."""
 
-from __future__ import annotations
-
 import logging
 from typing import Any
 

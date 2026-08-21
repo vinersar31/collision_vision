@@ -4,8 +4,6 @@ Only lightweight modules are eagerly imported here; the trainer and inference
 engine pull in ``ultralytics``/``torch`` lazily to keep imports cheap.
 """
 
-from __future__ import annotations
-
 from .config import Config
 from .converters import BaseConverter, COCOConverter, VIAConverter
 from .preprocess import DEFAULT_CLASSES, DatasetPreprocessor
@@ -14,12 +12,12 @@ from .split import DatasetSplitter
 __version__ = "0.1.0"
 
 __all__ = [
-    "Config",
+    "DEFAULT_CLASSES",
     "BaseConverter",
     "COCOConverter",
-    "VIAConverter",
+    "Config",
     "DatasetPreprocessor",
     "DatasetSplitter",
-    "DEFAULT_CLASSES",
+    "VIAConverter",
     "__version__",
 ]

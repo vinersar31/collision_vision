@@ -1,7 +1,5 @@
 """Tests for :class:`collision_vision.converters.COCOConverter`."""
 
-from __future__ import annotations
-
 import pytest
 
 from collision_vision.converters import COCOConverter
@@ -13,7 +11,10 @@ def test_coco_parse(coco_json, expected):
 
     assert len(annotations) == 1
     annotation = annotations[0]
-    assert (annotation.width, annotation.height) == (expected["img_w"], expected["img_h"])
+    assert (annotation.width, annotation.height) == (
+        expected["img_w"],
+        expected["img_h"],
+    )
     assert len(annotation.polygons) == 1
     assert annotation.polygons[0].class_id == 1  # category 2 -> "scratch" -> class 1
     assert len(annotation.polygons[0].points) == 4

@@ -1,15 +1,15 @@
-from __future__ import annotations
-
 import numpy as np
 import pytest
 
 from collision_vision.inference import DamageInstance
-from collision_vision.visualize import MaskVisualizer, _DEFAULT_PALETTE
+from collision_vision.visualize import _DEFAULT_PALETTE, MaskVisualizer
+
 
 @pytest.fixture
 def dummy_image() -> np.ndarray:
     """Return a black 100x100 BGR image."""
     return np.zeros((100, 100, 3), dtype=np.uint8)
+
 
 @pytest.fixture
 def valid_instance() -> DamageInstance:
@@ -23,6 +23,7 @@ def valid_instance() -> DamageInstance:
         bbox=(10, 10, 90, 90),
         area_px=6400,
     )
+
 
 @pytest.fixture
 def valid_instance_2() -> DamageInstance:
@@ -106,7 +107,7 @@ def test_overlay_draw_flags(dummy_image, valid_instance, draw_contours, draw_lab
         dummy_image,
         [valid_instance],
         draw_contours=draw_contours,
-        draw_labels=draw_labels
+        draw_labels=draw_labels,
     )
 
     assert result.shape == dummy_image.shape

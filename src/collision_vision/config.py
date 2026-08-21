@@ -35,7 +35,7 @@ class Config:
     params: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
-    def from_yaml(cls, path: str | Path) -> "Config":
+    def from_yaml(cls, path: str | Path) -> Config:
         """Load a :class:`Config` from a YAML file."""
         path = Path(path)
         if not path.is_file():

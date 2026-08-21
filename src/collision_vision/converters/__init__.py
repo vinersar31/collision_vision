@@ -6,8 +6,8 @@ from .via_converter import VIAConverter
 
 __all__ = [
     "BaseConverter",
+    "COCOConverter",
     "ImageAnnotation",
     "Polygon",
-    "COCOConverter",
     "VIAConverter",
 ]
