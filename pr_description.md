@@ -1,13 +1,5 @@
-## ⚡ Performance Improvement: Avoid string lowering in loop
+🔒 Fix Denial of Service vulnerability in image upload
 
-### 💡 What
-Updated `IMAGE_EXTENSIONS` to contain both lower and upper case extensions and removed `.lower()` inside the loop over directory contents in `src/collision_vision/split.py`.
-
-### 🎯 Why
-In Python, string methods like `.lower()` inside a tight loop create overhead by performing memory allocation and string conversion on every iteration. By pre-computing the upper and lower case forms and using a slightly larger set lookup, we bypass the string manipulation inside the loop completely.
-
-### 📊 Measured Improvement
-A synthetic benchmark iterating over 6000 paths (a mix of valid and invalid extensions) resulted in:
-- Baseline (using `.lower()`): ~0.8724s (for 1000 executions)
-- Improved (using precomputed extensions without `.lower()`): ~0.3539s (for 1000 executions)
-- Improvement: ~59.4% faster in execution time for this section of code.
+🎯 **What:** Fixed a vulnerability where users could upload arbitrarily large images, leading to excessive memory consumption during conversion to NumPy arrays.
+⚠️ **Risk:** A Denial of Service (DoS) attack could easily be triggered by an attacker uploading a very large image file (e.g., a "Decompression Bomb" or exceptionally high-resolution image). This would cause the Streamlit application to exhaust system memory and crash, taking down the service for all users.
+🛡️ **Solution:** Enforced a maximum image pixel limit (`Image.MAX_IMAGE_PIXELS = 25000000`) before image processing. Wrapped the image conversion logic in a `try...except Image.DecompressionBombError` block to gracefully catch the exception, stop processing, and display an error message to the user instead of crashing the server.
