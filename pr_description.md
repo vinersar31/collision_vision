@@ -1,9 +1,5 @@
-🎯 **What:** The testing gap in `src/collision_vision/converters/base.py` for the `BaseConverter.normalize` method has been addressed by adding a new test file `tests/test_base_converter.py`.
+🔒 Fix Denial of Service vulnerability in image upload
 
-📊 **Coverage:** The new tests cover:
-- Basic normalization of coordinates to the `[0, 1]` range.
-- Clipping of coordinates that fall outside the image boundaries.
-- Handling of an empty input list of points.
-- Raising a `ValueError` for invalid image sizes (width or height <= 0).
-
-✨ **Result:** Test coverage for `BaseConverter` has improved, and the `normalize` method is now fully tested for various scenarios, making the codebase more reliable.
+🎯 **What:** Fixed a vulnerability where users could upload arbitrarily large images, leading to excessive memory consumption during conversion to NumPy arrays.
+⚠️ **Risk:** A Denial of Service (DoS) attack could easily be triggered by an attacker uploading a very large image file (e.g., a "Decompression Bomb" or exceptionally high-resolution image). This would cause the Streamlit application to exhaust system memory and crash, taking down the service for all users.
+🛡️ **Solution:** Enforced a maximum image pixel limit (`Image.MAX_IMAGE_PIXELS = 25000000`) before image processing. Wrapped the image conversion logic in a `try...except Image.DecompressionBombError` block to gracefully catch the exception, stop processing, and display an error message to the user instead of crashing the server.

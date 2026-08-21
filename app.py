@@ -68,7 +68,12 @@ def main() -> None:
         return
 
     # --- Inference ---------------------------------------------------------
-    image_rgb = np.array(Image.open(uploaded).convert("RGB"))
+    Image.MAX_IMAGE_PIXELS = 25000000
+    try:
+        image_rgb = np.array(Image.open(uploaded).convert("RGB"))
+    except Image.DecompressionBombError:
+        st.error("Uploaded image is too large. Please upload a smaller image.")
+        return
     image_bgr = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)
 
     try:
