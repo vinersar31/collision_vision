@@ -118,26 +118,7 @@ class VIAConverter(BaseConverter):
         """Parse the VIA export into :class:`ImageAnnotation` objects."""
         raw = self._load()
 
-        # Pre-fetch image sizes concurrently to minimize I/O wait
-        filenames_to_load = set()
-        for entry in raw.values():
-            filename = entry.get("filename")
-            if not filename:
-                continue
-            regions = entry.get("regions", [])
-            if isinstance(regions, dict):
-                regions = list(regions.values())
-            if not regions:
-                continue
-            if filename not in self._size_cache:
-                filenames_to_load.add(filename)
-
-        if filenames_to_load:
-            with concurrent.futures.ThreadPoolExecutor() as executor:
-                # Execution raises exceptions if any file is not found
-                list(executor.map(self._image_size, filenames_to_load))
-
-        annotations: list[ImageAnnotation] = []
+        valid_entries = []
         for entry in raw.values():
             filename = entry.get("filename")
             if not filename:
@@ -147,6 +128,22 @@ class VIAConverter(BaseConverter):
                 regions = list(regions.values())
             if not regions:
                 continue
+            valid_entries.append((filename, regions))
+
+        # Pre-fetch image sizes concurrently to minimize I/O wait
+        filenames_to_load = {
+            filename
+            for filename, _ in valid_entries
+            if filename not in self._size_cache
+        }
+
+        if filenames_to_load:
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                # Execution raises exceptions if any file is not found
+                list(executor.map(self._image_size, filenames_to_load))
+
+        annotations: list[ImageAnnotation] = []
+        for filename, regions in valid_entries:
             width, height = self._image_size(filename)
             polygons: list[Polygon] = []
             for region in regions:
