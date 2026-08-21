@@ -10,7 +10,22 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 # Image extensions considered when pairing images with label files.
-IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff", ".webp"}
+IMAGE_EXTENSIONS = {
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".bmp",
+    ".tif",
+    ".tiff",
+    ".webp",
+    ".JPG",
+    ".JPEG",
+    ".PNG",
+    ".BMP",
+    ".TIF",
+    ".TIFF",
+    ".WEBP",
+}
 
 
 class DatasetSplitter:
@@ -54,7 +69,7 @@ class DatasetSplitter:
         """Return ``(image_path, label_path)`` pairs that both exist."""
         pairs: list[tuple[Path, Path]] = []
         for image_path in sorted(self.images_dir.iterdir()):
-            if image_path.suffix.lower() not in IMAGE_EXTENSIONS:
+            if image_path.suffix not in IMAGE_EXTENSIONS:
                 continue
             label_path = self.labels_dir / f"{image_path.stem}.txt"
             if label_path.is_file():
