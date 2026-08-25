@@ -14,6 +14,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import html
 import json
 import re
@@ -81,7 +82,9 @@ def download(url: str, dest: Path, retries: int = 4) -> bool:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Download licensed car-damage sample photos.")
+    parser = argparse.ArgumentParser(
+        description="Download licensed car-damage sample photos."
+    )
     parser.add_argument("--out", default="data/examples", help="Output directory.")
     args = parser.parse_args()
 
@@ -91,33 +94,61 @@ def main() -> None:
         stale.unlink()
 
     pages = (fetch_metadata(COMMONS_TITLES).get("query") or {}).get("pages") or {}
-    attributions = ["# Example image attributions", "",
-                    "Real crash photos from Wikimedia Commons, used as demo uploads.", ""]
+    attributions = [
+        "# Example image attributions",
+        "",
+        "Real crash photos from Wikimedia Commons, used as demo uploads.",
+        "",
+    ]
 
-    index = 0
-    for page in pages.values():
+    def _process_page(page: dict):
         info = (page.get("imageinfo") or [{}])[0]
         thumb = info.get("thumburl")
         if not thumb:
-            print(f"! no URL for {page.get('title')}")
-            continue
+            return None, f"! no URL for {page.get('title')}"
+
         meta = info.get("extmetadata") or {}
         title = page.get("title", "").replace("File:", "")
         license_name = _clean((meta.get("LicenseShortName") or {}).get("value"))
         author = _clean((meta.get("Artist") or {}).get("value"))
         source_page = info.get("descriptionurl", "")
-
         ext = ".png" if info.get("mime") == "image/png" else ".jpg"
-        filename = f"real_{index:02d}_{_slug(title)}{ext}"
-        if not download(thumb, out_dir / filename):
-            continue
-        print(f"downloaded {filename}  [{license_name}]")
 
-        attributions.append(f"- **{filename}** — “{title}” by {author}, {license_name}. {source_page}")
-        index += 1
-        time.sleep(1.5)  # be polite to the Commons servers between downloads
+        tmp_name = out_dir / f"tmp_{_slug(title)}{ext}"
+        if not download(thumb, tmp_name):
+            return None, None
 
-    (out_dir / "ATTRIBUTIONS.md").write_text("\n".join(attributions) + "\n", encoding="utf-8")
+        return tmp_name, (title, author, license_name, source_page, ext)
+
+    def _polite_iter():
+        for page in pages.values():
+            yield page
+            time.sleep(2.0)
+
+    index = 0
+    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+        for result in executor.map(_process_page, _polite_iter()):
+            if not result:
+                continue
+            tmp_path, data = result
+            if not tmp_path:
+                if data:
+                    print(data)
+                continue
+
+            title, author, license_name, source_page, ext = data
+            filename = f"real_{index:02d}_{_slug(title)}{ext}"
+            tmp_path.rename(out_dir / filename)
+            print(f"downloaded {filename}  [{license_name}]")
+
+            attributions.append(
+                f"- **{filename}** — “{title}” by {author}, {license_name}. {source_page}"
+            )
+            index += 1
+
+    (out_dir / "ATTRIBUTIONS.md").write_text(
+        "\n".join(attributions) + "\n", encoding="utf-8"
+    )
     print(f"\nSaved {index} image(s) + ATTRIBUTIONS.md to {out_dir}")
 
 
