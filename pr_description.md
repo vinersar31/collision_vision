@@ -1,5 +1,10 @@
-🔒 Fix Denial of Service vulnerability in image upload
+✨ Add GitHub Actions release workflow
 
-🎯 **What:** Fixed a vulnerability where users could upload arbitrarily large images, leading to excessive memory consumption during conversion to NumPy arrays.
-⚠️ **Risk:** A Denial of Service (DoS) attack could easily be triggered by an attacker uploading a very large image file (e.g., a "Decompression Bomb" or exceptionally high-resolution image). This would cause the Streamlit application to exhaust system memory and crash, taking down the service for all users.
-🛡️ **Solution:** Enforced a maximum image pixel limit (`Image.MAX_IMAGE_PIXELS = 25000000`) before image processing. Wrapped the image conversion logic in a `try...except Image.DecompressionBombError` block to gracefully catch the exception, stop processing, and display an error message to the user instead of crashing the server.
+🎯 **What:** Created a new GitHub Actions workflow (`.github/workflows/release.yml`) for creating release builds and tags.
+✅ **Why:** To automate the process of creating release branches, packaging the application for deployment (including source code and excluding unnecessary development artifacts), and publishing a GitHub Release with the corresponding version tag.
+🛠️ **How:**
+- The workflow is manually triggered (`workflow_dispatch`) with a required `version` input.
+- It checks out the `main` branch.
+- It creates and pushes a new branch named `release/<version>`.
+- It creates a clean `release-package.zip` archive with the source code, `Dockerfile`, `requirements.txt`, etc., while excluding `.git`, `.github`, `tests`, `website`, cached files, and training outputs/data.
+- It utilizes the GitHub CLI (`gh release create`) to draft a new release using the zip artifact.
