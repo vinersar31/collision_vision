@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import random
 import shutil
+import concurrent.futures
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -94,14 +95,25 @@ class DatasetSplitter:
         n_val = int(len(pairs) * self.val_ratio)
         splits = {"val": pairs[:n_val], "train": pairs[n_val:]}
 
-        for split_name, split_pairs in splits.items():
-            image_out = self.output_dir / "images" / split_name
-            label_out = self.output_dir / "labels" / split_name
-            image_out.mkdir(parents=True, exist_ok=True)
-            label_out.mkdir(parents=True, exist_ok=True)
-            for image_path, label_path in split_pairs:
-                self._transfer(str(image_path), str(image_out / image_path.name))
-                self._transfer(str(label_path), str(label_out / label_path.name))
+        def transfer_pair(image_path, label_path, image_out, label_out):
+            self._transfer(str(image_path), str(image_out / image_path.name))
+            self._transfer(str(label_path), str(label_out / label_path.name))
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            futures = []
+            for split_name, split_pairs in splits.items():
+                image_out = self.output_dir / "images" / split_name
+                label_out = self.output_dir / "labels" / split_name
+                image_out.mkdir(parents=True, exist_ok=True)
+                label_out.mkdir(parents=True, exist_ok=True)
+                for image_path, label_path in split_pairs:
+                    futures.append(
+                        executor.submit(
+                            transfer_pair, image_path, label_path, image_out, label_out
+                        )
+                    )
+            for future in concurrent.futures.as_completed(futures):
+                future.result()
 
         counts = {name: len(pairs_) for name, pairs_ in splits.items()}
         logger.info("Split dataset: %d train / %d val", counts["train"], counts["val"])
