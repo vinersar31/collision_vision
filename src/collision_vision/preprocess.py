@@ -33,7 +33,9 @@ class DatasetPreprocessor:
                 class id. Defaults to :data:`DEFAULT_CLASSES`.
         """
         self.class_names = class_names or list(DEFAULT_CLASSES)
-        self.class_map = {name.lower(): idx for idx, name in enumerate(self.class_names)}
+        self.class_map = {
+            name.lower(): idx for idx, name in enumerate(self.class_names)
+        }
 
     def _build_converter(
         self, fmt: str, annotations: str | Path, images_dir: str | Path, **kwargs
@@ -50,7 +52,9 @@ class DatasetPreprocessor:
             )
         if fmt == "coco":
             return COCOConverter(annotations_path=annotations, class_map=self.class_map)
-        raise ValueError(f"Unsupported annotation format: {fmt!r} (expected 'via' or 'coco')")
+        raise ValueError(
+            f"Unsupported annotation format: {fmt!r} (expected 'via' or 'coco')"
+        )
 
     def generate_data_yaml(self, output_dir: str | Path) -> Path:
         """Write the Ultralytics ``data.yaml`` descriptor.
@@ -101,7 +105,9 @@ class DatasetPreprocessor:
         Returns:
             Path to the generated ``data.yaml``.
         """
-        converter = self._build_converter(fmt, annotations, images_dir, **converter_kwargs)
+        converter = self._build_converter(
+            fmt, annotations, images_dir, **converter_kwargs
+        )
 
         with tempfile.TemporaryDirectory() as tmp:
             labels_tmp = Path(tmp) / "labels"

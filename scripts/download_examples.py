@@ -81,7 +81,9 @@ def download(url: str, dest: Path, retries: int = 4) -> bool:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Download licensed car-damage sample photos.")
+    parser = argparse.ArgumentParser(
+        description="Download licensed car-damage sample photos."
+    )
     parser.add_argument("--out", default="data/examples", help="Output directory.")
     args = parser.parse_args()
 
@@ -91,8 +93,12 @@ def main() -> None:
         stale.unlink()
 
     pages = (fetch_metadata(COMMONS_TITLES).get("query") or {}).get("pages") or {}
-    attributions = ["# Example image attributions", "",
-                    "Real crash photos from Wikimedia Commons, used as demo uploads.", ""]
+    attributions = [
+        "# Example image attributions",
+        "",
+        "Real crash photos from Wikimedia Commons, used as demo uploads.",
+        "",
+    ]
 
     index = 0
     for page in pages.values():
@@ -113,11 +119,15 @@ def main() -> None:
             continue
         print(f"downloaded {filename}  [{license_name}]")
 
-        attributions.append(f"- **{filename}** — “{title}” by {author}, {license_name}. {source_page}")
+        attributions.append(
+            f"- **{filename}** — “{title}” by {author}, {license_name}. {source_page}"
+        )
         index += 1
         time.sleep(1.5)  # be polite to the Commons servers between downloads
 
-    (out_dir / "ATTRIBUTIONS.md").write_text("\n".join(attributions) + "\n", encoding="utf-8")
+    (out_dir / "ATTRIBUTIONS.md").write_text(
+        "\n".join(attributions) + "\n", encoding="utf-8"
+    )
     print(f"\nSaved {index} image(s) + ATTRIBUTIONS.md to {out_dir}")
 
 

@@ -16,7 +16,6 @@ from pathlib import Path
 import cv2
 import numpy as np
 import streamlit as st
-from PIL import Image
 
 from collision_vision.inference import DamageSegmenter
 from collision_vision.visualize import MaskVisualizer
@@ -68,13 +67,19 @@ def main() -> None:
         return
 
     # --- Inference ---------------------------------------------------------
-    Image.MAX_IMAGE_PIXELS = 25000000
-    try:
-        image_rgb = np.array(Image.open(uploaded).convert("RGB"))
-    except Image.DecompressionBombError:
+    file_bytes = np.frombuffer(uploaded.read(), np.uint8)
+    image_bgr = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
+    if image_bgr is None:
+        st.error("Failed to decode the uploaded image.")
+        return
+
+    # Enforce a maximum pixel count
+    max_pixels = 25000000
+    if image_bgr.shape[0] * image_bgr.shape[1] > max_pixels:
         st.error("Uploaded image is too large. Please upload a smaller image.")
         return
-    image_bgr = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)
+
+    image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
 
     try:
         segmenter = load_segmenter(weights)

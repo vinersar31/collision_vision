@@ -58,7 +58,9 @@ class BaseConverter(ABC):
     objects; the base class handles normalization and label writing.
     """
 
-    def __init__(self, annotations_path: str | Path, class_map: dict[str, int] | None = None):
+    def __init__(
+        self, annotations_path: str | Path, class_map: dict[str, int] | None = None
+    ):
         """Initialize the converter.
 
         Args:
@@ -67,7 +69,9 @@ class BaseConverter(ABC):
         """
         self.annotations_path = Path(annotations_path)
         if not self.annotations_path.is_file():
-            raise FileNotFoundError(f"Annotation file not found: {self.annotations_path}")
+            raise FileNotFoundError(
+                f"Annotation file not found: {self.annotations_path}"
+            )
         self.class_map = {k.lower(): v for k, v in (class_map or {}).items()}
 
     @abstractmethod

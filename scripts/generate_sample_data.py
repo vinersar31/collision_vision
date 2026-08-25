@@ -25,8 +25,12 @@ CLASSES = ["dent", "scratch", "structural"]
 
 # Simple BGR car-body palette to vary the demo images.
 _BODY_COLORS = [
-    (60, 60, 190), (180, 120, 40), (70, 160, 70),
-    (40, 40, 40), (190, 190, 190), (150, 90, 160),
+    (60, 60, 190),
+    (180, 120, 40),
+    (70, 160, 70),
+    (40, 40, 40),
+    (190, 190, 190),
+    (150, 90, 160),
 ]
 
 
@@ -35,8 +39,12 @@ def _ellipse_polygon(cx, cy, rx, ry, n=16, jitter=0.0, rng=None):
     points = []
     for k in range(n):
         ang = 2 * math.pi * k / n
-        scale = 1.0 + (float(rng.uniform(-jitter, jitter)) if rng is not None and jitter else 0.0)
-        points.append((int(cx + rx * math.cos(ang) * scale), int(cy + ry * math.sin(ang) * scale)))
+        scale = 1.0 + (
+            float(rng.uniform(-jitter, jitter)) if rng is not None and jitter else 0.0
+        )
+        points.append(
+            (int(cx + rx * math.cos(ang) * scale), int(cy + ry * math.sin(ang) * scale))
+        )
     return points
 
 
@@ -57,34 +65,44 @@ def _scratch_polygon(cx, cy, length, width, angle):
 def _draw_car(canvas, rng):
     """Draw a simple car over a road/sky background; return (body_rect, color)."""
     height, width = canvas.shape[:2]
-    canvas[:, :] = (235, 225, 205)                                     # sky
-    cv2.rectangle(canvas, (0, int(height * 0.72)), (width, height), (95, 95, 95), -1)  # road
+    canvas[:, :] = (235, 225, 205)  # sky
+    cv2.rectangle(
+        canvas, (0, int(height * 0.72)), (width, height), (95, 95, 95), -1
+    )  # road
 
     color = tuple(int(c) for c in _BODY_COLORS[int(rng.integers(len(_BODY_COLORS)))])
     bx, by = int(width * 0.12), int(height * 0.44)
     bw, bh = int(width * 0.76), int(height * 0.26)
     cv2.rectangle(canvas, (bx, by), (bx + bw, by + bh), color, -1)
 
-    cabin = np.array([
-        [bx + int(bw * 0.24), by],
-        [bx + int(bw * 0.36), by - int(bh * 0.75)],
-        [bx + int(bw * 0.70), by - int(bh * 0.75)],
-        [bx + int(bw * 0.80), by],
-    ], np.int32)
+    cabin = np.array(
+        [
+            [bx + int(bw * 0.24), by],
+            [bx + int(bw * 0.36), by - int(bh * 0.75)],
+            [bx + int(bw * 0.70), by - int(bh * 0.75)],
+            [bx + int(bw * 0.80), by],
+        ],
+        np.int32,
+    )
     cv2.fillPoly(canvas, [cabin], color)
-    window = np.array([
-        [bx + int(bw * 0.31), by - 2],
-        [bx + int(bw * 0.40), by - int(bh * 0.58)],
-        [bx + int(bw * 0.66), by - int(bh * 0.58)],
-        [bx + int(bw * 0.71), by - 2],
-    ], np.int32)
+    window = np.array(
+        [
+            [bx + int(bw * 0.31), by - 2],
+            [bx + int(bw * 0.40), by - int(bh * 0.58)],
+            [bx + int(bw * 0.66), by - int(bh * 0.58)],
+            [bx + int(bw * 0.71), by - 2],
+        ],
+        np.int32,
+    )
     cv2.fillPoly(canvas, [window], (55, 45, 40))
 
     wheel_r = int(bh * 0.42)
     for wx in (bx + int(bw * 0.24), bx + int(bw * 0.76)):
         cv2.circle(canvas, (wx, by + bh), wheel_r, (25, 25, 25), -1)
         cv2.circle(canvas, (wx, by + bh), int(wheel_r * 0.45), (120, 120, 120), -1)
-    cv2.circle(canvas, (bx + bw - 8, by + int(bh * 0.30)), int(bh * 0.12), (200, 240, 255), -1)
+    cv2.circle(
+        canvas, (bx + bw - 8, by + int(bh * 0.30)), int(bh * 0.12), (200, 240, 255), -1
+    )
     return (bx, by, bw, bh), color
 
 
@@ -94,11 +112,17 @@ def _damage_polygon(rng, body_rect, damage_type):
     cx = int(rng.integers(bx + int(bw * 0.12), bx + int(bw * 0.88)))
     cy = int(rng.integers(by + int(bh * 0.22), by + int(bh * 0.80)))
     if damage_type == "dent":
-        return _ellipse_polygon(cx, cy, int(bw * 0.06), int(bh * 0.26), n=16, jitter=0.07, rng=rng)
+        return _ellipse_polygon(
+            cx, cy, int(bw * 0.06), int(bh * 0.26), n=16, jitter=0.07, rng=rng
+        )
     if damage_type == "scratch":
         length = int(rng.integers(int(bw * 0.18), int(bw * 0.35)))
-        return _scratch_polygon(cx, cy, length, int(rng.integers(4, 10)), float(rng.uniform(-0.6, 0.6)))
-    return _ellipse_polygon(cx, cy, int(bw * 0.10), int(bh * 0.34), n=11, jitter=0.45, rng=rng)
+        return _scratch_polygon(
+            cx, cy, length, int(rng.integers(4, 10)), float(rng.uniform(-0.6, 0.6))
+        )
+    return _ellipse_polygon(
+        cx, cy, int(bw * 0.10), int(bh * 0.34), n=11, jitter=0.45, rng=rng
+    )
 
 
 def _draw_damage(canvas, points, damage_type, body_color, rng):
@@ -107,9 +131,16 @@ def _draw_damage(canvas, points, damage_type, body_color, rng):
     if damage_type == "dent":
         cv2.fillPoly(canvas, [poly], tuple(int(c * 0.55) for c in body_color))
         x, y, w, h = cv2.boundingRect(poly)
-        cv2.ellipse(canvas, (x + w // 2, y + h // 2),
-                    (max(2, w // 3), max(2, h // 3)), 0, 0, 360,
-                    tuple(int(c * 0.35) for c in body_color), -1)
+        cv2.ellipse(
+            canvas,
+            (x + w // 2, y + h // 2),
+            (max(2, w // 3), max(2, h // 3)),
+            0,
+            0,
+            360,
+            tuple(int(c * 0.35) for c in body_color),
+            -1,
+        )
     elif damage_type == "scratch":
         cv2.fillPoly(canvas, [poly], (225, 225, 230))
         cv2.polylines(canvas, [poly], True, (150, 150, 160), 1)
@@ -182,7 +213,9 @@ def generate_dataset(
         image, points = _render_scene(rng, damage)
         filename = f"{prefix}_{damage}_{i:03d}.jpg"
         cv2.imwrite(str(images_dir / filename), image)
-        records.append((filename, (images_dir / filename).stat().st_size, points, damage))
+        records.append(
+            (filename, (images_dir / filename).stat().st_size, points, damage)
+        )
 
     if annotated:
         return _write_via(out_dir, records)
@@ -190,9 +223,15 @@ def generate_dataset(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Generate a synthetic car-damage training set.")
-    parser.add_argument("--num-images", type=int, default=24, help="Training images to create.")
-    parser.add_argument("--out", default="data/raw", help="Output dir for the training set.")
+    parser = argparse.ArgumentParser(
+        description="Generate a synthetic car-damage training set."
+    )
+    parser.add_argument(
+        "--num-images", type=int, default=24, help="Training images to create."
+    )
+    parser.add_argument(
+        "--out", default="data/raw", help="Output dir for the training set."
+    )
     parser.add_argument("--seed", type=int, default=0, help="Random seed.")
     args = parser.parse_args()
 
@@ -201,8 +240,10 @@ def main() -> None:
 
     print(f"Training set : {args.num_images} images + {annotations}")
     print("\nNext steps:")
-    print(f"  collision-vision preprocess --format via --annotations {annotations} "
-          f"--images {out / 'images'} --attribute-key damage")
+    print(
+        f"  collision-vision preprocess --format via --annotations {annotations} "
+        f"--images {out / 'images'} --attribute-key damage"
+    )
     print("  collision-vision train --config config.yaml")
     print("  python scripts/download_examples.py   # real photos to upload in the app")
 

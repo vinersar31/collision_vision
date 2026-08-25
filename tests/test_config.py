@@ -4,6 +4,7 @@ import pytest
 
 from collision_vision.config import Config
 
+
 def test_config_file_not_found(tmp_path):
     # Construct a path to a non-existent file
     non_existent_path = tmp_path / "does_not_exist.yaml"
