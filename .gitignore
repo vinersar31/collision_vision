@@ -40,5 +40,6 @@ Thumbs.db
 .pytest_cache/
 .coverage
 htmlcov/
-mock_images/
-mock_annotations.json
+fake_images/
+fake_via.json
+out.txt
