@@ -42,7 +42,7 @@ class Config:
             raise FileNotFoundError(f"Config file not found: {path}")
         raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
         if not isinstance(raw, dict):
-            raise ValueError(f"Config root must be a mapping, got {type(raw).__name__}")
+            raise ValueError(f"Config root must be a mapping, got {raw.__class__.__name__}")
         raw = dict(raw)  # shallow copy — we mutate via pop
         model = raw.pop("model", DEFAULT_MODEL)
         data = raw.pop("data", DEFAULT_DATA)
