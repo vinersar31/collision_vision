@@ -6,10 +6,12 @@ import pytest
 from collision_vision.inference import DamageInstance
 from collision_vision.visualize import MaskVisualizer, _DEFAULT_PALETTE
 
+
 @pytest.fixture
 def dummy_image() -> np.ndarray:
     """Return a black 100x100 BGR image."""
     return np.zeros((100, 100, 3), dtype=np.uint8)
+
 
 @pytest.fixture
 def valid_instance() -> DamageInstance:
@@ -23,6 +25,7 @@ def valid_instance() -> DamageInstance:
         bbox=(10, 10, 90, 90),
         area_px=6400,
     )
+
 
 @pytest.fixture
 def valid_instance_2() -> DamageInstance:
@@ -79,12 +82,15 @@ def test_color_for():
     assert vis.color_for(3) == (0, 0, 0)
 
 
+# Test edge case: an empty instances list should return a copy of the input image
+
+
 def test_overlay_empty_instances(dummy_image):
     vis = MaskVisualizer()
     result = vis.overlay(dummy_image, [])
 
     # Assert result is identical but a copy
-    assert np.array_equal(result, dummy_image)
+    np.testing.assert_array_equal(result, dummy_image)
     assert result is not dummy_image
 
 
@@ -106,7 +112,7 @@ def test_overlay_draw_flags(dummy_image, valid_instance, draw_contours, draw_lab
         dummy_image,
         [valid_instance],
         draw_contours=draw_contours,
-        draw_labels=draw_labels
+        draw_labels=draw_labels,
     )
 
     assert result.shape == dummy_image.shape

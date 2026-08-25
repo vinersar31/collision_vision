@@ -1,5 +1,3 @@
-🔒 Fix Denial of Service vulnerability in image upload
-
-🎯 **What:** Fixed a vulnerability where users could upload arbitrarily large images, leading to excessive memory consumption during conversion to NumPy arrays.
-⚠️ **Risk:** A Denial of Service (DoS) attack could easily be triggered by an attacker uploading a very large image file (e.g., a "Decompression Bomb" or exceptionally high-resolution image). This would cause the Streamlit application to exhaust system memory and crash, taking down the service for all users.
-🛡️ **Solution:** Enforced a maximum image pixel limit (`Image.MAX_IMAGE_PIXELS = 25000000`) before image processing. Wrapped the image conversion logic in a `try...except Image.DecompressionBombError` block to gracefully catch the exception, stop processing, and display an error message to the user instead of crashing the server.
+🎯 **What:** The testing gap addressed: updated the existing `test_overlay_empty_instances` to use `np.testing.assert_array_equal` for more robust error reporting when testing the condition where the `instances` array is empty. This explicitly verifies that the returned array is identical or deeply equal to the input image array. Added explanatory comments to clarify this edge case. Fixed an unused `pathlib.Path` import in `tests/test_split.py`.
+📊 **Coverage:** Empty instance arrays passed to `MaskVisualizer.overlay` (which should trigger a fast-path return of the original image without any modifications, ensuring the result is equivalent to `image.copy()`).
+✨ **Result:** A more robust, properly asserted, and well-documented test suite for the visualize component.

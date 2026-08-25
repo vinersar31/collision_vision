@@ -1,5 +1,4 @@
 import pytest
-from pathlib import Path
 from collision_vision.split import DatasetSplitter
 
 @pytest.fixture
