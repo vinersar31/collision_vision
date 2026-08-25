@@ -66,9 +66,13 @@ class MaskVisualizer:
 
         # Blend all mask fills in one pass so overlapping regions stay readable.
         fill = base.copy()
+        polygons_by_class: dict[int, list[np.ndarray]] = {}
         for instance in instances:
-            color = self.color_for(instance.class_id)
-            cv2.fillPoly(fill, (instance.polygon,), color=color)
+            polygons_by_class.setdefault(instance.class_id, []).append(instance.polygon)
+
+        for class_id, polygons in polygons_by_class.items():
+            color = self.color_for(class_id)
+            cv2.fillPoly(fill, polygons, color=color)
         cv2.addWeighted(fill, self.alpha, base, 1.0 - self.alpha, 0.0, dst=base)
 
         for instance in instances:

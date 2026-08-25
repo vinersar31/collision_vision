@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., 1.0.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Create release branch
+        run: |
+          git checkout -b release/${{ inputs.version }}
+          git push origin release/${{ inputs.version }}
+
+      - name: Create release package
+        run: |
+          zip -r release-package.zip . -x "*.git*" ".github/*" "tests/*" "website/*" ".pytest_cache/*" "__pycache__/*" "*.pyc" "data/raw/*" "data/processed/*" "models/*" "runs/*"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create release/${{ inputs.version }} release-package.zip \
+            --title "Release ${{ inputs.version }}" \
+            --target release/${{ inputs.version }} \
+            --notes "Release ${{ inputs.version }}"
