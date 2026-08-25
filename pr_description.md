@@ -1,3 +1,0 @@
-🎯 **What:** The testing gap addressed: updated the existing `test_overlay_empty_instances` to use `np.testing.assert_array_equal` for more robust error reporting when testing the condition where the `instances` array is empty. This explicitly verifies that the returned array is identical or deeply equal to the input image array. Added explanatory comments to clarify this edge case. Fixed an unused `pathlib.Path` import in `tests/test_split.py`.
-📊 **Coverage:** Empty instance arrays passed to `MaskVisualizer.overlay` (which should trigger a fast-path return of the original image without any modifications, ensuring the result is equivalent to `image.copy()`).
-✨ **Result:** A more robust, properly asserted, and well-documented test suite for the visualize component.
