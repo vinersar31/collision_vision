@@ -1,5 +1,7 @@
-🔒 Fix Denial of Service vulnerability in image upload
+🔒 Fix Server-Side Request Forgery (SSRF) / Local File Read in download_examples.py
 
-🎯 **What:** Fixed a vulnerability where users could upload arbitrarily large images, leading to excessive memory consumption during conversion to NumPy arrays.
-⚠️ **Risk:** A Denial of Service (DoS) attack could easily be triggered by an attacker uploading a very large image file (e.g., a "Decompression Bomb" or exceptionally high-resolution image). This would cause the Streamlit application to exhaust system memory and crash, taking down the service for all users.
-🛡️ **Solution:** Enforced a maximum image pixel limit (`Image.MAX_IMAGE_PIXELS = 25000000`) before image processing. Wrapped the image conversion logic in a `try...except Image.DecompressionBombError` block to gracefully catch the exception, stop processing, and display an error message to the user instead of crashing the server.
+🎯 **What:** The `download` function in `scripts/download_examples.py` previously accepted any URL scheme and passed it directly to `urllib.request.urlopen`. This PR adds URL scheme validation to ensure only `http` and `https` schemes are permitted.
+
+⚠️ **Risk:** Without scheme validation, an attacker or malformed input could exploit the script to access internal resources or read local files using schemes like `file://` or `ftp://`. This constitutes a Server-Side Request Forgery (SSRF) and Local File Read vulnerability, potentially exposing sensitive data.
+
+🛡️ **Solution:** The fix utilizes `urllib.parse.urlparse` to extract the scheme from the provided URL. If the scheme is not `http` or `https`, the function rejects the URL, prints a warning message, and returns `False`, thereby neutralizing the vulnerability. A new test suite `tests/test_download_examples.py` has also been added to verify this behavior.

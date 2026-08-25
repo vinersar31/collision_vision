@@ -65,6 +65,11 @@ def fetch_metadata(titles: list[str]) -> dict:
 
 def download(url: str, dest: Path, retries: int = 4) -> bool:
     """Download ``url`` to ``dest``, retrying with backoff on transient errors."""
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme not in ("http", "https"):
+        print(f"! rejected invalid scheme {parsed.scheme!r} for URL {url}")
+        return False
+
     for attempt in range(1, retries + 1):
         try:
             req = urllib.request.Request(url, headers={"User-Agent": UA})
